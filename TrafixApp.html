@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trafix Traffic Map</title>
+
+  <!-- Link to Leaflet CSS (for styling the map) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  
+  <!-- Optional: Style the map container -->
+  <style>
+    #map {
+      height: 500px; /* Adjust map height */
+      width: 100%; /* Ensure map fills the container */
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Title of the map -->
+  <h1>Trafix Traffic Map</h1>
+
+  <!-- Map container -->
+  <div id="map"></div>
+
+  <!-- Link to Leaflet JS (for map functionality) -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    // Initialize the map and set the default view for Metro Manila area
+    var map = L.map('map').setView([14.5995, 120.9842], 11); // Metro Manila coordinates and zoom level
+
+    // Add OpenStreetMap tiles to the map
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Store the markers created for traffic data
+    var trafficMarkers = [];
+
+    // Function to simulate updating traffic data for Metro Manila
+    function getTrafficData() {
+      return [
+        { lat: 14.5995, lon: 120.9842, speed: Math.floor(Math.random() * 40) + 20 },  // Metro Manila center
+        { lat: 14.6760, lon: 121.0437, speed: Math.floor(Math.random() * 40) + 20 },  // Quezon City
+        { lat: 14.5547, lon: 121.0244, speed: Math.floor(Math.random() * 40) + 20 },  // Makati
+        { lat: 14.5164, lon: 121.0472, speed: Math.floor(Math.random() * 40) + 20 },  // Manila City
+        { lat: 14.7345, lon: 121.0577, speed: Math.floor(Math.random() * 40) + 20 },  // Marikina
+        { lat: 14.5170, lon: 120.9793, speed: Math.floor(Math.random() * 40) + 20 },  // Pasay City
+        { lat: 14.5919, lon: 120.9717, speed: Math.floor(Math.random() * 40) + 20 },  // Paranaque
+        { lat: 14.5894, lon: 120.9780, speed: Math.floor(Math.random() * 40) + 20 },  // Taguig (BGC)
+        { lat: 14.6000, lon: 121.1000, speed: Math.floor(Math.random() * 40) + 20 },  // Mandaluyong
+        { lat: 14.5497, lon: 120.9927, speed: Math.floor(Math.random() * 40) + 20 },  // Pasig City
+      ];
+    }
+
+    // Function to update the map with dynamic traffic speed markers
+    function updateTrafficMarkers() {
+      var trafficData = getTrafficData(); // Get updated traffic data
+
+      // Loop through the traffic data and update markers
+      trafficData.forEach(function(data, index) {
+        var color = data.speed >= 60 ? 'green' : (data.speed >= 30 ? 'yellow' : 'red');
+        
+        // Update existing marker or add new one
+        if (trafficMarkers[index]) {
+          trafficMarkers[index].setLatLng([data.lat, data.lon]);
+          trafficMarkers[index].setRadius(10);
+          trafficMarkers[index].setStyle({ color: color });
+          trafficMarkers[index].bindPopup("<b>Traffic Speed</b><br>Speed: " + data.speed + " km/h");
+        } else {
+          var marker = L.circleMarker([data.lat, data.lon], {
+            color: color,
+            radius: 10
+          }).addTo(map);
+          marker.bindPopup("<b>Traffic Speed</b><br>Speed: " + data.speed + " km/h");
+          trafficMarkers.push(marker); // Store the new marker
+        }
+      });
+    }
+
+    // Update traffic markers every 5 seconds to simulate real-time data
+    setInterval(updateTrafficMarkers, 5000);
+
+    // Initial marker update
+    updateTrafficMarkers();
+
+  </script>
+
+</body>
+</html>
